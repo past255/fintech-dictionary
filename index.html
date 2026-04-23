@@ -97,7 +97,7 @@
 
     <footer class="max-w-3xl mx-auto px-4 py-12 text-center border-t border-gray-50 mt-10">
         <p class="text-gray-400 text-[13px] leading-relaxed">
-            🌑 Нашли ошибку или нет нужного показателя — <br class="sm:hidden"> 
+            🖤 Если нужного показателя нет в списке — <br class="sm:hidden"> 
             напишите Диме <a href="mailto:kapranov@hey.com" class="text-blue-500 font-medium hover:underline">kapranov@hey.com</a>.
         </p>
     </footer>
@@ -108,7 +108,7 @@
                 search: '',
                 activeCategory: 'Все',
                 opened: null,
-                categories: ['Все', 'Финансы', 'Юнит-экономика', 'Прибыль', 'Риски', 'Клиентский опыт', 'Поддержка', 'Надёжность', 'Вовлечённость', 'Воронка', 'Маркетинг', 'Дискавери'],
+                categories: ['Все', 'Финансы', 'Юнит-экономика', 'Риски', 'Клиентский опыт', 'Надёжность', 'Вовлечённость', 'Воронка', 'Дискавери'],
                 
                 toggle(index) {
                     this.opened = this.opened === index ? null : index;
@@ -142,12 +142,12 @@
                     { abbr: 'Burn Multiple', name: 'Burn Multiple', category: 'Юнит-экономика', desc: 'Эффективность сжигания капитала.', formula: 'Net Burn / Net New ARR', value: 'Сколько компания тратит на 1$ нового регулярного дохода.' },
 
                     // --- P&L (ПРИБЫЛЬ И УБЫТКИ) ---
-                    { abbr: 'EVA', name: 'Economic Value Added', category: 'Прибыль', desc: 'Экономическая добавленная стоимость.', formula: 'NOPAT − (Invested Capital × WACC)', value: 'Создаёт ли бизнес стоимость сверх затрат на привлечённый капитал. EVA > 0 — создаёт, < 0 — уничтожает.' },
-                    { abbr: 'EBITDA', name: 'Earnings Before Interest, Taxes, Depreciation & Amortization', category: 'Прибыль', desc: 'Прибыль до процентов, налогов и амортизации.', formula: 'Revenue − OPEX (без D&A, процентов и налогов)', value: 'Грубая оценка операционной генерации денег бизнесом.' },
-                    { abbr: 'Gross Margin', name: 'Валовая маржа', category: 'Прибыль', desc: 'Доля валовой прибыли в выручке.', formula: '(Revenue − COGS) / Revenue × 100%', value: 'Что остаётся после прямой себестоимости продукта.' },
-                    { abbr: 'Operating Margin', name: 'Операционная маржа (EBIT Margin)', category: 'Прибыль', desc: 'Доля операционной прибыли в выручке.', formula: 'Operating Income / Revenue × 100%', value: 'Эффективность основной деятельности, без учёта финансовых и налоговых эффектов.' },
-                    { abbr: 'Net Margin', name: 'Чистая маржа', category: 'Прибыль', desc: 'Доля чистой прибыли в выручке.', formula: 'Net Income / Revenue × 100%', value: 'Итоговая рентабельность бизнеса после всех расходов, налогов и процентов.' },
-                    { abbr: 'Contribution Margin', name: 'Маржинальная прибыль', category: 'Прибыль', desc: 'Выручка за вычетом переменных затрат.', formula: 'Revenue − Variable Costs', value: 'Сколько остаётся на покрытие постоянных расходов и формирование прибыли.' },
+                    { abbr: 'EVA', name: 'Economic Value Added', category: 'Финансы', desc: 'Экономическая добавленная стоимость.', formula: 'NOPAT − (Invested Capital × WACC)', value: 'Создаёт ли бизнес стоимость сверх затрат на привлечённый капитал. EVA > 0 — создаёт, < 0 — уничтожает.' },
+                    { abbr: 'EBITDA', name: 'Earnings Before Interest, Taxes, Depreciation & Amortization', category: 'Финансы', desc: 'Прибыль до процентов, налогов и амортизации.', formula: 'Revenue − OPEX (без D&A, процентов и налогов)', value: 'Грубая оценка операционной генерации денег бизнесом.' },
+                    { abbr: 'Gross Margin', name: 'Валовая маржа', category: 'Финансы', desc: 'Доля валовой прибыли в выручке.', formula: '(Revenue − COGS) / Revenue × 100%', value: 'Что остаётся после прямой себестоимости продукта.' },
+                    { abbr: 'Operating Margin', name: 'Операционная маржа (EBIT Margin)', category: 'Финансы', desc: 'Доля операционной прибыли в выручке.', formula: 'Operating Income / Revenue × 100%', value: 'Эффективность основной деятельности, без учёта финансовых и налоговых эффектов.' },
+                    { abbr: 'Net Margin', name: 'Чистая маржа', category: 'Финансы', desc: 'Доля чистой прибыли в выручке.', formula: 'Net Income / Revenue × 100%', value: 'Итоговая рентабельность бизнеса после всех расходов, налогов и процентов.' },
+                    { abbr: 'Contribution Margin', name: 'Маржинальная прибыль', category: 'Финансы', desc: 'Выручка за вычетом переменных затрат.', formula: 'Revenue − Variable Costs', value: 'Сколько остаётся на покрытие постоянных расходов и формирование прибыли.' },
 
                     // --- CUSTOMER EXPERIENCE (CX) ---
                     { abbr: 'NPS', name: 'Net Promoter Score', category: 'Клиентский опыт', desc: 'Индекс лояльности.', formula: '% Promoters (9-10) − % Detractors (0-6)', value: 'Готовность рекомендовать продукт друзьям.' },
@@ -158,11 +158,11 @@
                     { abbr: 'SUS', name: 'System Usability Scale', category: 'Клиентский опыт', desc: 'Шкала юзабилити системы.', formula: 'Опрос из 10 вопросов с весами', value: 'Стандартизированная оценка удобства интерфейса.' },
 
                     // --- SERVICE QUALITY & SUPPORT ---
-                    { abbr: 'FCR', name: 'First Contact Resolution', category: 'Поддержка', desc: 'Решение при первом обращении.', formula: '(Заявки без повторных обращений / Всего заявок) × 100%', value: 'Доля заявок, решенных без необходимости клиенту писать/звонить снова.' },
-                    { abbr: 'FRT / ART', name: 'First Response Time', category: 'Поддержка', desc: 'Время первого ответа.', formula: 'Среднее время ожидания в очереди или до первого ответа оператора', value: 'Критический фактор удовлетворенности саппортом.' },
-                    { abbr: 'AHT', name: 'Average Handle Time', category: 'Поддержка', desc: 'Среднее время обработки.', formula: 'Среднее время на полный цикл решения (включая работу после звонка)', value: 'Эффективность работы оператора.' },
-                    { abbr: 'SLA', name: 'Service Level Agreement', category: 'Поддержка', desc: 'Соблюдение уровня сервиса.', formula: '% обращений, обработанных в рамках лимита (напр. за 30 сек)', value: 'Держит ли сервис обещанные стандарты скорости.' },
-                    { abbr: 'CCR', name: 'Customer Complaint Rate', category: 'Поддержка', desc: 'Уровень жалоб.', formula: 'Кол-во жалоб / Общее число транзакций или клиентов', value: 'Сигнализирует о массовых сбоях или проблемах в процессах.' },
+                    { abbr: 'FCR', name: 'First Contact Resolution', category: 'Клиентский опыт', desc: 'Решение при первом обращении.', formula: '(Заявки без повторных обращений / Всего заявок) × 100%', value: 'Доля заявок, решенных без необходимости клиенту писать/звонить снова.' },
+                    { abbr: 'FRT / ART', name: 'First Response Time', category: 'Клиентский опыт', desc: 'Время первого ответа.', formula: 'Среднее время ожидания в очереди или до первого ответа оператора', value: 'Критический фактор удовлетворенности саппортом.' },
+                    { abbr: 'AHT', name: 'Average Handle Time', category: 'Клиентский опыт', desc: 'Среднее время обработки.', formula: 'Среднее время на полный цикл решения (включая работу после звонка)', value: 'Эффективность работы оператора.' },
+                    { abbr: 'SLA', name: 'Service Level Agreement', category: 'Клиентский опыт', desc: 'Соблюдение уровня сервиса.', formula: '% обращений, обработанных в рамках лимита (напр. за 30 сек)', value: 'Держит ли сервис обещанные стандарты скорости.' },
+                    { abbr: 'CCR', name: 'Customer Complaint Rate', category: 'Клиентский опыт', desc: 'Уровень жалоб.', formula: 'Кол-во жалоб / Общее число транзакций или клиентов', value: 'Сигнализирует о массовых сбоях или проблемах в процессах.' },
 
                     // --- TECH QUALITY ---
                     { abbr: 'Uptime / SLI', name: 'Availability', category: 'Надёжность', desc: 'Доступность системы.', formula: '% времени доступности (напр. 99.9%)', value: 'Время, когда система работает корректно.' },
@@ -190,11 +190,11 @@
                     { abbr: 'TR (Take Rate)', name: 'Take Rate (Credit)', category: 'Воронка', desc: 'Процент взятия кредита после одобрения.', formula: '% клиентов, подписавших договор от числа одобренных', value: 'Насколько условия после одобрения устроили клиента.' },
 
                     // --- MARKETING ---
-                    { abbr: 'CPA', name: 'Cost Per Action', category: 'Маркетинг', desc: 'Стоимость действия.', formula: 'Маркетинг / Кол-во действий (лидов)', value: 'Цена регистрации или заявки.' },
-                    { abbr: 'CPO', name: 'Cost Per Order', category: 'Маркетинг', desc: 'Стоимость заказа.', formula: 'Маркетинг / Кол-во сделок (выдач)', value: 'Цена одной продажи или выданного продукта.' },
-                    { abbr: 'ROMI', name: 'Return on Marketing Investment', category: 'Маркетинг', desc: 'Окупаемость маркетинговых инвестиций.', formula: '(Доход от маркетинга - Расходы) / Расходы', value: 'Рентабельность маркетинговых трат с учётом прибыли.' },
-                    { abbr: 'AOV', name: 'Average Order Value', category: 'Маркетинг', desc: 'Средний чек.', formula: 'Выручка / Кол-во заказов', value: 'Объем средней транзакции.' },
-                    { abbr: 'RPC', name: 'Revenue Per Click', category: 'Маркетинг', desc: 'Доход на клик.', formula: 'Доход / Кол-во кликов', value: 'Помогает понять, сколько можно платить за клик в аукционе.' },
+                    { abbr: 'CPA', name: 'Cost Per Action', category: 'Юнит-экономика', desc: 'Стоимость действия.', formula: 'Маркетинг / Кол-во действий (лидов)', value: 'Цена регистрации или заявки.' },
+                    { abbr: 'CPO', name: 'Cost Per Order', category: 'Юнит-экономика', desc: 'Стоимость заказа.', formula: 'Маркетинг / Кол-во сделок (выдач)', value: 'Цена одной продажи или выданного продукта.' },
+                    { abbr: 'ROMI', name: 'Return on Marketing Investment', category: 'Юнит-экономика', desc: 'Окупаемость маркетинговых инвестиций.', formula: '(Доход от маркетинга - Расходы) / Расходы', value: 'Рентабельность маркетинговых трат с учётом прибыли.' },
+                    { abbr: 'AOV', name: 'Average Order Value', category: 'Юнит-экономика', desc: 'Средний чек.', formula: 'Выручка / Кол-во заказов', value: 'Объем средней транзакции.' },
+                    { abbr: 'RPC', name: 'Revenue Per Click', category: 'Юнит-экономика', desc: 'Доход на клик.', formula: 'Доход / Кол-во кликов', value: 'Помогает понять, сколько можно платить за клик в аукционе.' },
 
                     // --- RISKS ---
                     { abbr: 'PD', name: 'Probability of Default', category: 'Риски', desc: 'Вероятность дефолта заемщика.', formula: 'Процент заемщиков, которые перестанут платить', value: 'Базовая метрика для оценки кредитного риска.' },
