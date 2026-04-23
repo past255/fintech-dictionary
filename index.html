@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fintech & Product Metrics Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #1a1a1a; }
+        [x-cloak] { display: none !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body x-data="metricsApp()">
+
+    <!-- Fixed Header -->
+    <header class="sticky top-0 bg-white/90 backdrop-blur-md border-b border-gray-100 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-xl font-bold tracking-tight text-blue-600">Fintech Library</h1>
+                <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold" x-text="filteredMetrics.length + ' терминов'"></span>
+            </div>
+            
+            <div class="relative mb-4">
+                <input type="text" x-model="search" 
+                       placeholder="Поиск (напр. LTV, NPS, Uptime)..." 
+                       class="w-full bg-gray-100 border-none rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-sm">
+            </div>
+            
+            <div class="flex flex-wrap gap-1.5 pb-1">
+                <template x-for="cat in categories" :key="cat">
+                    <button @click="activeCategory = cat" 
+                            :class="activeCategory === cat ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                            class="px-3 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition active:scale-95"
+                            x-text="cat"></button>
+                </template>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-6">
+        <div class="divide-y divide-gray-100">
+            <template x-for="(item, index) in filteredMetrics" :key="index">
+                <div class="py-1">
+                    <button @click="toggle(index)" 
+                            class="w-full text-left py-4 flex items-start justify-between hover:bg-gray-50/50 transition px-2 rounded-lg group">
+                        <div class="pr-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-base text-gray-900 group-hover:text-blue-600 transition" x-text="item.abbr"></span>
+                                <span class="text-[9px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded uppercase font-bold tracking-wider" x-text="item.category"></span>
+                            </div>
+                            <div class="text-sm text-gray-500 font-normal" x-text="item.name"></div>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-300 transition-transform duration-300 mt-1" 
+                             :class="opened === index ? 'rotate-180 text-blue-500' : ''"
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    <div x-show="opened === index" x-collapse x-cloak>
+                        <div class="px-2 pb-6 pt-2 text-sm space-y-4">
+                            <div class="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl space-y-3">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase text-blue-400 block mb-1">Описание</span>
+                                    <p class="text-gray-700 leading-relaxed" x-text="item.desc"></p>
+                                </div>
+                                
+                                <template x-if="item.formula">
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase text-blue-400 block mb-1">Логика / Формула</span>
+                                        <code class="text-blue-700 font-mono text-xs break-all bg-white px-2 py-1 rounded border border-blue-100 block mt-1" x-text="item.formula"></code>
+                                    </div>
+                                </template>
+
+                                <template x-if="item.value">
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase text-blue-400 block mb-1">Смысл и Ценность</span>
+                                        <p class="text-gray-600" x-text="item.value"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <div x-show="filteredMetrics.length === 0" class="text-center py-20">
+            <p class="text-gray-400 text-sm">Ничего не найдено. Попробуйте другой запрос.</p>
+        </div>
+    </main>
+
+    <footer class="max-w-3xl mx-auto px-4 py-12 text-center border-t border-gray-50 mt-10">
+        <p class="text-gray-400 text-[13px] leading-relaxed">
+            🌑 Нашли ошибку или нет нужного показателя — <br class="sm:hidden"> 
+            напишите Диме <a href="mailto:kapranov@hey.com" class="text-blue-500 font-medium hover:underline">kapranov@hey.com</a>.
+        </p>
+    </footer>
+
+    <script>
+        function metricsApp() {
+            return {
+                search: '',
+                activeCategory: 'Все',
+                opened: null,
+                categories: ['Все', 'Финансы', 'Юнит-экономика', 'Прибыль', 'Риски', 'Клиентский опыт', 'Поддержка', 'Надёжность', 'Вовлечённость', 'Воронка', 'Маркетинг', 'Дискавери'],
+                
+                toggle(index) {
+                    this.opened = this.opened === index ? null : index;
+                },
+
+                metrics: [
+                    // --- FINANCE (бывш. Fintech) ---
+                    { abbr: 'RAROC', name: 'Risk-Adjusted Return on Capital', category: 'Финансы', desc: 'Рентабельность капитала с учетом риска.', formula: '(Revenue - Expenses - Expected Loss + Income from Capital) / Economic Capital', value: 'Позволяет сравнивать доходность разных продуктов (кредиты, карты) с учетом их рискованности.' },
+                    { abbr: 'ROE', name: 'Return on Equity', category: 'Финансы', desc: 'Рентабельность собственного капитала.', formula: 'Net Income / Average Shareholders\' Equity', value: 'Сколько прибыли бизнес приносит на 1₽ капитала акционеров — ключевая метрика для инвесторов.' },
+                    { abbr: 'ROA', name: 'Return on Assets', category: 'Финансы', desc: 'Рентабельность активов.', formula: 'Net Income / Average Total Assets', value: 'Насколько эффективно компания использует активы для генерации прибыли.' },
+                    { abbr: 'RoC', name: 'Return on Capital', category: 'Финансы', desc: 'Рентабельность инвестированного капитала.', formula: 'NOPAT / Invested Capital', value: 'Отдача на весь привлечённый капитал — и собственный, и заёмный. Без поправки на риск.' },
+                    { abbr: 'ROI', name: 'Return on Investment', category: 'Финансы', desc: 'Общая окупаемость инвестиций.', formula: '(Доход от инвестиции − Стоимость инвестиции) / Стоимость инвестиции × 100%', value: 'Универсальная метрика прибыльности любой инвестиции — от проекта до актива.' },
+                    { abbr: 'RWA', name: 'Risk-Weighted Assets', category: 'Финансы', desc: 'Активы, взвешенные по риску.', formula: 'Σ (Актив × Коэффициент риска по Базелю III)', value: 'База для расчёта нормативов достаточности капитала банка.' },
+                    { abbr: 'RoRWA', name: 'Return on Risk-Weighted Assets', category: 'Финансы', desc: 'Рентабельность активов, взвешенных по риску.', formula: 'Net Income / RWA', value: 'Прибыльность с поправкой на рискованность. Позволяет сравнивать банки с разной структурой активов.' },
+                    { abbr: 'NIM', name: 'Net Interest Margin', category: 'Финансы', desc: 'Чистая процентная маржа.', formula: '(Interest Income - Interest Expense) / Average Earning Assets', value: 'Показывает разницу между доходами по активам и расходами по пассивам.' },
+                    { abbr: 'CoR', name: 'Cost of Risk', category: 'Финансы', desc: 'Стоимость риска.', formula: 'Provision for Loan Losses / Average Loan Portfolio', value: 'Отношение резервов к кредитному портфелю. Качество кредитной политики.' },
+                    { abbr: 'NPL', name: 'Non-Performing Loans', category: 'Финансы', desc: 'Доля неработающих кредитов.', formula: 'Loans past due 90+ days / Total Portfolio', value: 'Показатель "плохих" долгов в портфеле.' },
+                    { abbr: 'CIR', name: 'Cost to Income Ratio', category: 'Финансы', desc: 'Отношение операционных расходов к доходу.', formula: 'Operating Expenses / Operating Income', value: 'Эффективность банковских процессов.' },
+                    { abbr: 'CASA', name: 'Current Account Savings Account', category: 'Финансы', desc: 'Доля остатков на текущих и сберегательных счетах.', formula: 'CASA Deposits / Total Deposits', value: 'Показывает долю самого дешевого фондирования для банка.' },
+
+                    // --- UNIT ECONOMICS ---
+                    { abbr: 'LTV', name: 'Lifetime Value', category: 'Юнит-экономика', desc: 'Пожизненная ценность клиента.', formula: 'ARPU × Customer Lifetime', value: 'Чистый доход от клиента за всё время.' },
+                    { abbr: 'CAC', name: 'Customer Acquisition Cost', category: 'Юнит-экономика', desc: 'Стоимость привлечения клиента.', formula: 'Marketing Expenses / New Customers', value: 'Во сколько обходится один платящий юзер.' },
+                    { abbr: 'LTV/CAC', name: 'LTV to CAC Ratio', category: 'Юнит-экономика', desc: 'Отношение ценности к стоимости привлечения.', formula: 'LTV / CAC', value: 'Ключевой индикатор здоровья модели. Норма ≥ 3, <1 — убыточная модель.' },
+                    { abbr: 'ARPU', name: 'Average Revenue Per User', category: 'Юнит-экономика', desc: 'Средняя выручка с одного пользователя.', formula: 'Общая выручка / Количество активных пользователей', value: 'Базовая метрика дохода на юзера за период.' },
+                    { abbr: 'ARPPU', name: 'Average Revenue Per Paying User', category: 'Юнит-экономика', desc: 'Средняя выручка с одного платящего пользователя.', formula: 'Выручка / Число платящих пользователей', value: 'Средний чек среди тех, кто действительно платит (без «размытия» бесплатной аудиторией).' },
+                    { abbr: 'Payback Period', name: 'CAC Payback Period', category: 'Юнит-экономика', desc: 'Срок окупаемости клиента.', formula: 'CAC / (ARPU × Gross Margin)', value: 'За сколько месяцев выручка от клиента окупает затраты на его привлечение.' },
+                    { abbr: 'Churn Rate', name: 'Customer Churn Rate', category: 'Юнит-экономика', desc: 'Отток клиентов за период.', formula: 'Ушедшие клиенты / Клиенты на начало периода × 100%', value: 'Прямо влияет на LTV: чем выше отток — тем короче жизненный цикл клиента.' },
+                    { abbr: 'MRR / ARR', name: 'Monthly / Annual Recurring Revenue', category: 'Юнит-экономика', desc: 'Регулярная ежемесячная / годовая выручка.', formula: 'Сумма активных подписок за месяц (× 12 для ARR)', value: 'Опорная метрика для SaaS и подписочных моделей.' },
+                    { abbr: 'NRR', name: 'Net Revenue Retention', category: 'Юнит-экономика', desc: 'Чистое удержание выручки в когорте.', formula: '(MRR₀ + Expansion − Contraction − Churn) / MRR₀', value: 'NRR > 100% означает, что существующие клиенты со временем приносят больше.' },
+                    { abbr: 'Burn Multiple', name: 'Burn Multiple', category: 'Юнит-экономика', desc: 'Эффективность сжигания капитала.', formula: 'Net Burn / Net New ARR', value: 'Сколько компания тратит на 1$ нового регулярного дохода.' },
+
+                    // --- P&L (ПРИБЫЛЬ И УБЫТКИ) ---
+                    { abbr: 'EVA', name: 'Economic Value Added', category: 'Прибыль', desc: 'Экономическая добавленная стоимость.', formula: 'NOPAT − (Invested Capital × WACC)', value: 'Создаёт ли бизнес стоимость сверх затрат на привлечённый капитал. EVA > 0 — создаёт, < 0 — уничтожает.' },
+                    { abbr: 'EBITDA', name: 'Earnings Before Interest, Taxes, Depreciation & Amortization', category: 'Прибыль', desc: 'Прибыль до процентов, налогов и амортизации.', formula: 'Revenue − OPEX (без D&A, процентов и налогов)', value: 'Грубая оценка операционной генерации денег бизнесом.' },
+                    { abbr: 'Gross Margin', name: 'Валовая маржа', category: 'Прибыль', desc: 'Доля валовой прибыли в выручке.', formula: '(Revenue − COGS) / Revenue × 100%', value: 'Что остаётся после прямой себестоимости продукта.' },
+                    { abbr: 'Operating Margin', name: 'Операционная маржа (EBIT Margin)', category: 'Прибыль', desc: 'Доля операционной прибыли в выручке.', formula: 'Operating Income / Revenue × 100%', value: 'Эффективность основной деятельности, без учёта финансовых и налоговых эффектов.' },
+                    { abbr: 'Net Margin', name: 'Чистая маржа', category: 'Прибыль', desc: 'Доля чистой прибыли в выручке.', formula: 'Net Income / Revenue × 100%', value: 'Итоговая рентабельность бизнеса после всех расходов, налогов и процентов.' },
+                    { abbr: 'Contribution Margin', name: 'Маржинальная прибыль', category: 'Прибыль', desc: 'Выручка за вычетом переменных затрат.', formula: 'Revenue − Variable Costs', value: 'Сколько остаётся на покрытие постоянных расходов и формирование прибыли.' },
+
+                    // --- CUSTOMER EXPERIENCE (CX) ---
+                    { abbr: 'NPS', name: 'Net Promoter Score', category: 'Клиентский опыт', desc: 'Индекс лояльности.', formula: '% Promoters (9-10) − % Detractors (0-6)', value: 'Готовность рекомендовать продукт друзьям.' },
+                    { abbr: 'CSI', name: 'Customer Satisfaction Index', category: 'Клиентский опыт', desc: 'Индекс удовлетворенности (комплексный).', formula: 'Средневзвешенное по параметрам (цена, качество, сервис)', value: 'Комплексная оценка продукта пользователем.' },
+                    { abbr: 'CSAT', name: 'Customer Satisfaction Score', category: 'Клиентский опыт', desc: 'Удовлетворенность здесь и сейчас.', formula: 'Сумма оценок / Количество ответов', value: 'Оценка конкретной функции или действия сразу после взаимодействия.' },
+                    { abbr: 'CES', name: 'Customer Effort Score', category: 'Клиентский опыт', desc: 'Индекс усилий.', formula: 'Средний балл по шкале усилий (1-7)', value: 'Насколько легко клиенту было решить свой вопрос.' },
+                    { abbr: 'DSAT', name: 'Dissatisfaction Score', category: 'Клиентский опыт', desc: 'Уровень недовольства.', formula: '% клиентов с низкими баллами (1-2 из 5)', value: 'Позволяет быстро найти «боли» и критические ошибки.' },
+                    { abbr: 'SUS', name: 'System Usability Scale', category: 'Клиентский опыт', desc: 'Шкала юзабилити системы.', formula: 'Опрос из 10 вопросов с весами', value: 'Стандартизированная оценка удобства интерфейса.' },
+
+                    // --- SERVICE QUALITY & SUPPORT ---
+                    { abbr: 'FCR', name: 'First Contact Resolution', category: 'Поддержка', desc: 'Решение при первом обращении.', formula: '(Заявки без повторных обращений / Всего заявок) × 100%', value: 'Доля заявок, решенных без необходимости клиенту писать/звонить снова.' },
+                    { abbr: 'FRT / ART', name: 'First Response Time', category: 'Поддержка', desc: 'Время первого ответа.', formula: 'Среднее время ожидания в очереди или до первого ответа оператора', value: 'Критический фактор удовлетворенности саппортом.' },
+                    { abbr: 'AHT', name: 'Average Handle Time', category: 'Поддержка', desc: 'Среднее время обработки.', formula: 'Среднее время на полный цикл решения (включая работу после звонка)', value: 'Эффективность работы оператора.' },
+                    { abbr: 'SLA', name: 'Service Level Agreement', category: 'Поддержка', desc: 'Соблюдение уровня сервиса.', formula: '% обращений, обработанных в рамках лимита (напр. за 30 сек)', value: 'Держит ли сервис обещанные стандарты скорости.' },
+                    { abbr: 'CCR', name: 'Customer Complaint Rate', category: 'Поддержка', desc: 'Уровень жалоб.', formula: 'Кол-во жалоб / Общее число транзакций или клиентов', value: 'Сигнализирует о массовых сбоях или проблемах в процессах.' },
+
+                    // --- TECH QUALITY ---
+                    { abbr: 'Uptime / SLI', name: 'Availability', category: 'Надёжность', desc: 'Доступность системы.', formula: '% времени доступности (напр. 99.9%)', value: 'Время, когда система работает корректно.' },
+                    { abbr: 'MTTR', name: 'Mean Time To Recovery', category: 'Надёжность', desc: 'Среднее время восстановления.', formula: 'Общее время простоя / Кол-во инцидентов', value: 'Как быстро инженеры чинят систему после падения.' },
+                    { abbr: 'MTBF', name: 'Mean Time Between Failures', category: 'Надёжность', desc: 'Среднее время между сбоями.', formula: 'Общее время работы / Кол-во сбоев', value: 'Показатель общей надежности и стабильности железа и кода.' },
+                    { abbr: 'Bug Density', name: 'Плотность багов', category: 'Надёжность', desc: 'Концентрация дефектов.', formula: 'Кол-во багов / Объем кода (KLOC) или на одну фичу', value: 'Качество кода до релиза.' },
+                    { abbr: 'Error Rate', name: 'Коэффициент ошибок', category: 'Надёжность', desc: 'Процент неуспешных запросов.', formula: '(Ошибки / Всего запросов) × 100%', value: 'Напр. доля HTTP 500 ответов сервера.' },
+                    { abbr: 'Latency', name: 'Задержка', category: 'Надёжность', desc: 'Время отклика.', formula: 'Миллисекунды (ms) от запроса до ответа', value: 'Скорость реакции интерфейса и сервера.' },
+
+                    // --- ENGAGEMENT ---
+                    { abbr: 'DAU', name: 'Daily Active Users', category: 'Вовлечённость', desc: 'Дневная аудитория.', formula: 'Кол-во уникальных юзеров за сутки', value: 'Показывает ежедневную востребованность.' },
+                    { abbr: 'MAU', name: 'Monthly Active Users', category: 'Вовлечённость', desc: 'Месячная аудитория.', formula: 'Кол-во уникальных юзеров за месяц', value: 'Общий размер "живой" базы.' },
+                    { abbr: 'Stickiness', name: 'Липкость', category: 'Вовлечённость', desc: 'Регулярность использования.', formula: 'DAU / MAU', value: 'Отражает, насколько часто пользователи возвращаются в продукт.' },
+                    { abbr: 'Retention Rate', name: 'Удержание', category: 'Вовлечённость', desc: 'Коэффициент возврата.', formula: '% юзеров, вернувшихся на день N', value: 'Главная метрика ценности продукта.' },
+                    { abbr: 'Adoption Rate', name: 'Уровень принятия', category: 'Вовлечённость', desc: 'Принятие новых функций.', formula: '% юзеров, начавших юзать новую фичу', value: 'Насколько успешно внедрена новая функциональность.' },
+                    { abbr: 'TTV', name: 'Time to Value', category: 'Вовлечённость', desc: 'Время до ценности.', formula: 'Время от регистрации до "Aha-moment"', value: 'Как быстро юзер понимает, зачем ему этот продукт.' },
+
+                    // --- FUNNEL METRICS ---
+                    { abbr: 'CR', name: 'Conversion Rate', category: 'Воронка', desc: 'Конверсия.', formula: '(Целевые действия / Посетители) × 100%', value: 'Эффективность любого этапа воронки.' },
+                    { abbr: 'CTR', name: 'Click-Through Rate', category: 'Воронка', desc: 'Кликабельность.', formula: '(Клики / Показы) × 100%', value: 'Эффективность кнопок, баннеров или офферов.' },
+                    { abbr: 'BR', name: 'Bounce Rate', category: 'Воронка', desc: 'Показатель отказов.', formula: '% ушедших со страницы почти сразу', value: 'Релевантность страницы ожиданиям пользователя.' },
+                    { abbr: 'AR (Activation)', name: 'Activation Rate', category: 'Воронка', desc: 'Уровень активации.', formula: '% выполнивших целевое действие ("Aha-moment")', value: 'Доля тех, кто реально начал пользоваться продуктом.' },
+                    { abbr: 'AR (Approval)', name: 'Approval Rate', category: 'Воронка', desc: 'Уровень одобрения.', formula: '% одобренных заявок от всех поданных', value: 'Критично для кредитов (эффективность риск-модели).' },
+                    { abbr: 'TR (Transaction)', name: 'Transaction Rate', category: 'Воронка', desc: 'Доля транзакционной активности.', formula: '% пользователей, совершивших покупку/платеж', value: 'Частота совершения денежных операций.' },
+                    { abbr: 'TR (Take Rate)', name: 'Take Rate (Credit)', category: 'Воронка', desc: 'Процент взятия кредита после одобрения.', formula: '% клиентов, подписавших договор от числа одобренных', value: 'Насколько условия после одобрения устроили клиента.' },
+
+                    // --- MARKETING ---
+                    { abbr: 'CPA', name: 'Cost Per Action', category: 'Маркетинг', desc: 'Стоимость действия.', formula: 'Маркетинг / Кол-во действий (лидов)', value: 'Цена регистрации или заявки.' },
+                    { abbr: 'CPO', name: 'Cost Per Order', category: 'Маркетинг', desc: 'Стоимость заказа.', formula: 'Маркетинг / Кол-во сделок (выдач)', value: 'Цена одной продажи или выданного продукта.' },
+                    { abbr: 'ROMI', name: 'Return on Marketing Investment', category: 'Маркетинг', desc: 'Окупаемость маркетинговых инвестиций.', formula: '(Доход от маркетинга - Расходы) / Расходы', value: 'Рентабельность маркетинговых трат с учётом прибыли.' },
+                    { abbr: 'AOV', name: 'Average Order Value', category: 'Маркетинг', desc: 'Средний чек.', formula: 'Выручка / Кол-во заказов', value: 'Объем средней транзакции.' },
+                    { abbr: 'RPC', name: 'Revenue Per Click', category: 'Маркетинг', desc: 'Доход на клик.', formula: 'Доход / Кол-во кликов', value: 'Помогает понять, сколько можно платить за клик в аукционе.' },
+
+                    // --- RISKS ---
+                    { abbr: 'PD', name: 'Probability of Default', category: 'Риски', desc: 'Вероятность дефолта заемщика.', formula: 'Процент заемщиков, которые перестанут платить', value: 'Базовая метрика для оценки кредитного риска.' },
+                    { abbr: 'LGD', name: 'Loss Given Default', category: 'Риски', desc: 'Доля потерь при дефолте.', formula: '(Сумма риска - Возврат) / Сумма риска', value: 'Сколько реально потеряет банк, если случится дефолт.' },
+                    { abbr: 'EAD', name: 'Exposure at Default', category: 'Риски', desc: 'Величина требования в момент дефолта.', formula: 'Остаток долга + неиспользованный лимит × CCF', value: 'Определяет, какая сумма будет под риском в момент дефолта.' },
+                    { abbr: 'EL', name: 'Expected Loss', category: 'Риски', desc: 'Ожидаемые потери.', formula: 'PD × LGD × EAD', value: 'Сумма, которую банк закладывает в риск-часть тарифа.' },
+
+                    // --- DISCOVERY ---
+                    { abbr: 'JTBD', name: 'Jobs to be Done', category: 'Дискавери', desc: 'Фреймворк для понимания мотивации пользователя.', formula: 'Context + Motivation + Outcome', value: 'Люди покупают не продукт, а решение своей задачи.' },
+                    { abbr: 'CustDev', name: 'Customer Development', category: 'Дискавери', desc: 'Проверка гипотез через интервью с пользователями.', formula: 'Гипотеза → Интервью → Инсайт → Пивот/Сохранение', value: 'Помогает не строить то, что никому не нужно.' },
+                    { abbr: 'Design Thinking', name: 'Дизайн-мышление', category: 'Дискавери', desc: 'Человекоцентричный подход к решению задач.', formula: 'Empathize → Define → Ideate → Prototype → Test', value: 'Находит неочевидные решения через глубокое понимание пользователя.' },
+                    { abbr: 'Lean Startup', name: 'Бережливый стартап / MVP', category: 'Дискавери', desc: 'Итеративная проверка идей через минимально жизнеспособный продукт.', formula: 'Build → Measure → Learn', value: 'Позволяет быстро и дёшево валидировать бизнес-гипотезы.' },
+                    { abbr: 'CJM', name: 'Customer Journey Map', category: 'Дискавери', desc: 'Карта пути клиента.', formula: 'Этапы × Действия × Эмоции × Барьеры', value: 'Визуализирует опыт клиента и вскрывает провалы в сервисе.' },
+                    { abbr: 'HADI', name: 'Hypothesis-Action-Data-Insight', category: 'Дискавери', desc: 'Цикл проверки продуктовых гипотез.', formula: 'Гипотеза → Действие → Данные → Инсайт', value: 'Структурирует работу с гипотезами и превращает тесты в знание.' },
+                    { abbr: 'OST', name: 'Opportunity Solution Tree', category: 'Дискавери', desc: 'Дерево возможностей и решений (Teresa Torres).', formula: 'Outcome → Opportunities → Solutions → Experiments', value: 'Связывает бизнес-цели с инсайтами пользователей и экспериментами.' },
+                    { abbr: 'VPC', name: 'Value Proposition Canvas', category: 'Дискавери', desc: 'Канва ценностного предложения.', formula: 'Jobs + Pains + Gains ↔ Products + Pain Relievers + Gain Creators', value: 'Проверяет соответствие продукта реальным задачам клиента.' },
+                    { abbr: 'RICE', name: 'Reach-Impact-Confidence-Effort', category: 'Дискавери', desc: 'Фреймворк приоритизации идей.', formula: '(Reach × Impact × Confidence) / Effort', value: 'Помогает объективно выбирать, что делать в первую очередь.' },
+                    { abbr: 'ICE', name: 'Impact-Confidence-Ease', category: 'Дискавери', desc: 'Упрощённая приоритизация гипотез.', formula: 'Impact × Confidence × Ease', value: 'Быстрая оценка идей без долгих расчётов и данных.' },
+                    { abbr: 'Kano', name: 'Модель Кано', category: 'Дискавери', desc: 'Классификация фич по типу удовлетворённости.', formula: 'Must-have / Performance / Delighters / Indifferent', value: 'Определяет, какие фичи базовые, а какие «восхищают» пользователя.' },
+                    { abbr: 'Persona', name: 'Пользовательская персона', category: 'Дискавери', desc: 'Архетипический портрет пользователя.', formula: 'Демография + Цели + Боли + Поведение', value: 'Позволяет команде обсуждать «живого» пользователя вместо абстрактной ЦА.' },
+                    { abbr: 'Empathy Map', name: 'Карта эмпатии', category: 'Дискавери', desc: 'Инструмент для понимания контекста пользователя.', formula: 'Says / Thinks / Does / Feels', value: 'Собирает в одном месте что пользователь говорит, думает, делает и чувствует.' },
+                    { abbr: 'A/B Test', name: 'A/B-тест', category: 'Дискавери', desc: 'Сплит-тестирование двух версий на реальных пользователях.', formula: 'Контрольная группа (A) vs. Тестовая (B) + статзначимость', value: 'Позволяет принимать решения на основе данных, а не мнений.' }
+                ],
+
+                get filteredMetrics() {
+                    const s = this.search.toLowerCase();
+                    return this.metrics.filter(m => {
+                        const match = m.abbr.toLowerCase().includes(s) || 
+                                      m.name.toLowerCase().includes(s) || 
+                                      m.desc.toLowerCase().includes(s);
+                        const catMatch = this.activeCategory === 'Все' || m.category === this.activeCategory;
+                        return match && catMatch;
+                    }).sort((a, b) => a.abbr.localeCompare(b.abbr));
+                }
+            }
+        }
+    </script>
+</body>
+</html>
